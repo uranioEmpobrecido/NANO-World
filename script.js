@@ -143,8 +143,9 @@ const locations = [
 // Create scene, camera, and renderer
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer();
+const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio); // Ensure high-quality rendering on high-DPI screens
 document.getElementById('globe-container').appendChild(renderer.domElement);
 
 // Add ambient light
@@ -158,7 +159,7 @@ scene.add(directionalLight);
 
 // Create the globe
 const globe = new ThreeGlobe()
-    .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+    .globeImageUrl('https://neo.gsfc.nasa.gov/archive/bluemarble/bmng/world_2km/world.200402.3x21600x10800.jpg') // Using the new high-resolution image
     .arcsData(locations.map(({ lat, lon }) => ({
         startLat: lat,
         startLng: lon,
@@ -179,10 +180,16 @@ scene.add(globe);
 // Set camera position
 camera.position.z = 500;
 
+// Add OrbitControls
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableZoom = true;
+controls.enablePan = false;
+
 // Animate the scene
 function animate() {
     requestAnimationFrame(animate);
-    globe.rotation.y += 0.001;
+    globe.rotation.y += 0.0005;
+    controls.update();
     renderer.render(scene, camera);
 }
 animate();
